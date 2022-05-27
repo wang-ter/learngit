@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+    //   1、函数
+    // var name = 123
+    // function fun(){
+    //     console.log(this)
+    //     console.log(this.name)
+    // }
+    // // 1.1 指向window 
+    // fun()
+    // // 1.2 指向对象 —— 函数在对象内
+    // var obj = {
+    //     name:'obj的名字',
+    //     getName:fun
+    // }
+    // obj.getName()
+    // //  1.3 嵌套函数 —— 指向window
+    // var obj1 = {
+    //     a:2,
+    //     foo:function(){
+    //         console.log(this,'111')
+    //         function test(){
+    //             console.log(this)
+    //         }
+    //         test()
+    //     }
+    // }
+    // obj1.foo()
+   
+
+    //  闭包中的this默认指向window
+    // var obj = {
+    //     name:'obj的名字',
+    //     getName:function(){
+    //         console.log(this,'???')
+    //         function nei(){
+    //             console.log(this,'window??')
+    //         }
+    //         nei()  
+    //     }
+    // }
+//   obj.getName()
+
+
+   //  自执行函数也是指向window
+//    (function() {
+//     console.log(this); // window
+//     })()   
+
+//     // 
+//     var obj={
+//         name:'只执行',
+//         getName:function(){
+//             // console.log(this)
+//             (function(){
+//                 console.log(this,'???')
+//             })()
+//         }
+//     }
+//     obj.getName()
+
+
+
+    // 2、方法
+
+
+    //  3、构造函数
+    // function Fn(){
+    //     console.log(this)
+    // }
+    // var fn = new Fn()
+    // console.log(fn)
+
+    // 4、事件绑定函数
+    // var name = '外层',age=40
+    // var obj = {
+    //     name:'内层',
+    //     getname:function(){
+    //         console.log(this.name,this.age)
+    //     }
+    // }
+    // obj.getname.call() // 指向外层
+    // obj.getname.call(obj)
+
+
+
+    //
+
+
+    function Person(name,age){
+    this.name = name
+    this.age = age
+    this.info = function(){
+        console.log(this.name + '/'+this.age)
+    }
+    console.log(this) 
+    console.log(this.name)
+}
+
+Person('11',18)  // this为window
+    </script>
+</body>
+</html>

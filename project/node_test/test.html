@@ -1,0 +1,531 @@
+<template>
+  <div>
+      <!-- <div id="upload" @click="upload()">
+        <p>
+                <el-upload
+      action="#"
+      :file-list="filelist"
+      multiple
+      :on-change="uploadchange"
+      :on-remove="uploadremove"
+      style="color:white"><i class="el-icon-plus">
+          
+          </i></el-upload></p>
+      </div>  -->
+
+    <div class="editor-content">
+       <div id="upload" @click="upload1()">
+         <!-- <p style="color:white;font-weight:bold"> 用户</p> -->
+          <p><i class="el-icon-upload"></i></p>
+         
+      </div>     
+
+      <br>
+
+       <input id="filetest" type="file" ref="inputtest"/>
+      <!-- <div id="upload" @click="upload2()">
+        <p style="color:white;font-weight:bold"> 通用</p>
+          <p><i class="el-icon-upload"></i></p>
+      </div>
+      <div id="upload" @click="upload()">
+          <p><i class="el-icon-upload"></i></p>
+      </div>
+      <div id="upload" @click="upload()">
+          <p><i class="el-icon-upload"></i></p>
+      </div> -->
+    </div>
+     <el-dialog
+        title="导入资产"
+        :visible.sync="dialogVisible"
+        width="38%"
+        >
+        <el-form
+        ref="form" 
+        :model="form"
+        :label-position="labelPosition"
+        label-width="120px"
+        style="margin-right:15%;margin-left:5%">        
+          <el-form-item label="*资产名称:">
+            <el-input size="small" v-model="name"></el-input>
+          </el-form-item>
+          <el-form-item label="*资产文件路径:">
+            <el-upload
+            ref="uploadref" 
+            style="display:inline-block;width:80px" 
+            :auto-upload="false"            
+            webkitdectory
+            action="#"
+            multiple
+            :show-file-list="showfilelist"
+            :on-change="dataUpload"
+            :on-remove="dataUploadRemove"
+            :file-list="fileList1"
+            :on-success="uploadsuccess">
+              <button size="small" type="info" style="background:transparent;color:white;border:1px white solid">
+                <i class="el-icon-upload2"></i>
+                上传
+              </button>
+          </el-upload>
+            <el-button style="background:transparent;border:none" @click="clearfile()">清除</el-button>       
+          </el-form-item>
+
+          <el-form-item label="缩略图:">
+            <el-upload
+            action="#" 
+            list-type="picture-card" 
+            :auto-upload="false"
+            :file-list="fileList"
+            :class="{ hide: hideUpload_introduce}"
+            :on-change="handleIntroduceUploadHide"
+            :on-remove="handleIntroduceUploadShow">
+              <span style="position:relative;top:-10px">
+                <i class="el-icon-plus"></i>
+              </span>
+            </el-upload>
+          </el-form-item>
+
+          <el-form-item style="width:100%;margin-left:16%">
+            <el-button @click="dialogClose()" type="info" size="small">取消</el-button>
+            <el-button type="primary" @click="formSubmit()" size="small">确认</el-button>          
+          </el-form-item>
+        </el-form>
+     </el-dialog>
+  </div>
+</template>
+
+<script>
+import SparkMD5 from 'spark-md5'
+import axios from 'axios'
+
+export default{
+  name:'props91',
+  data () {
+    return{
+           fileList1:[],
+                showfilelist:true,
+            // video: {
+            //     url: 'https://api.dogecloud.com/player/get.mp4?vcode=5ac682e6f8231991&userId=17&ext=.mp4',
+            //     cover: 'https://i.loli.net/2019/06/06/5cf8c5d9c57b510947.png',
+            //     muted: false,
+            //     loop: false,
+            //     preload: 'auto',
+            //     poster: '',
+            //     volume: 1,
+            //     autoplay: false
+            // },
+            flag:false,
+            video:{},
+    //   dialogVisible:false,
+    //   labelPosition:'right',
+    //   name:'',
+    //   form:{
+             
+    //   },
+    //   uploadref:'',
+    //   chunkSize:0,
+    //   fileList:[],
+    //   fileList1:[],
+    //   showfilelist:true,
+    //   hideUpload_introduce:false,
+    //   limitCount:1,
+    //   asset_type:'摄像头资产',
+    //   remark:'',
+    //   index:'',
+    //   upfile:'',
+    //   upfiles:[],
+    //   files : [],
+    //   units:['B','kb','MB','GB'],
+    //   maxFileSize:600*1024*1024,
+    //   md5:'',
+    //   flag:0,
+    //   upfiles1:[],
+    //   instance:'',
+    //   flagpic:0,
+    //   username:'',
+    //   roletype:'',     
+    //   instance1:'',
+    //   picinfo:'',
+    }
+  },
+  mounted(){
+        var that = this
+        that.video =document.createElement("video")
+        that.video.setAttribute('controls','controvls')
+        document.querySelector('input[type="file"]').addEventListener('change', function() {
+            document.body.appendChild(that.video)
+            that.video.src = window.URL.createObjectURL(this.files[0])
+            that.getpicinfo(that.video)
+        })
+  },
+  created(){
+    this.username = sessionStorage.getItem('username')
+
+          this.instance1 =  axios.create({
+       baseURL:'http://127.0.0.1:8085/',
+       headers:{
+                'Content-Type':'multipart/form-data'
+                }
+      })
+
+    this.instance =  axios.create({
+       baseURL:'http://127.0.0.1:8086/',
+       headers:{
+                'Content-Type':'multipart/form-data'
+                }
+      })
+
+  },
+  methods:{
+      getpicinfo(video){
+            console.log(this.video,'000111100000----------------------------------------')
+            var that = this
+            var imgHeight = 0,imgWidth = 0,videoWidth = 0,videoHeight = 0     
+        //要截图的视频
+        var canvas = document.createElement("canvas");
+        var canvasCtx = canvas.getContext("2d");
+
+        //视频准备好可以播放
+          video.addEventListener("canplay",function() {
+            console.log('00000000-----------')
+            console.log(video.offsetWidth)
+            //获取展示的video宽高作为画布的宽高和临时视频截图的宽高
+            canvas.width = imgWidth = video.offsetWidth;
+            // console.log(canvas.width,'sssssssss')
+            canvas.height = imgHeight = video.offsetHeight;
+            //获取实际视频的宽高，相当于视频分辨率吧
+            videoWidth = video.videoWidth;
+            videoHeight = video.videoHeight;
+            setTimeout(() => {
+                  video.pause();
+                  //坐原图像的x,y轴坐标，大小，目标图像的x，y轴标，大小。
+                  canvasCtx.drawImage(video, 0, 0, videoWidth, videoHeight, 0, 0, imgWidth, imgHeight);
+                  //把图标base64编码后变成一段url字符串
+                  var dataUrl = canvas.toDataURL("image/png");
+                  console.log(dataUrl,'999999999999')
+                  // 获取图片的base64格式
+                  const base64ConvertFile = function (urlData, filename) { // 64转file
+                  if (typeof urlData != 'string') {
+                      this.$toast("urlData不是字符串")
+                      return;
+                  }
+                  var arr = urlData.split(',')
+                  var type = arr[0].match(/:(.*?);/)[1]
+                  var fileExt = type.split('/')[1]
+                  var bstr = atob(arr[1])
+                  var n = bstr.length
+                  var u8arr = new Uint8Array(n)
+                  while (n--) {
+                      u8arr[n] = bstr.charCodeAt(n);
+                  }
+                  return new File([u8arr], 'filename.' + fileExt, {
+                      type: type
+                  });
+            }
+                  base64ConvertFile(dataUrl,'test')
+                  // 通过上一篇文章的：https://www.haorooms.com/post/js_file_base64_blob 把base64转换为file
+                  that.picinfo = base64ConvertFile(dataUrl,'test')
+                  console.log(that.picinfo)
+                   // 然后通过上一节的ajax进行上传
+                                       var picform = new FormData()
+              picform.append('picform',that.picinfo)
+              let url = `http://127.0.0.1:8085/upload?type=pic&md5Val=undefined&name=111&assettype=undefined&remark=undefined&filename=${that.picinfo.name}`
+              that.instance1.post(url,picform).then(res=>{
+                console.log(res,'rrrrrr是什么')
+              })
+                //   var picform = new FormData()
+                //   picform.append('picform',that.picinfo)
+                //   let url = `http://127.0.0.1:8086/upload?type=pic&md5Val=${that.md5}&username=admin&roletype=role&name=111&assettype=${that.asset_type}&remark=${that.remark}&filename=${that.picinfo.name}&uploadtype=png`
+                //   that.instance.post(url,picform).then(res=>{
+                //   console.log(res,'rrrrrr是什么')
+                // })
+            }, 1000);// 1000毫秒，就是截取第一秒，2000毫秒就是截取第2秒，视频1秒通常24帧，也可以换算成截取第几帧。
+            //防止拖动进度条的时候重复触发
+            video.removeEventListener("canplay", arguments.callee);
+        });
+    },
+    //  对话框显示
+    upload1(){
+      this.roletype = "role"
+      this.dialogVisible = !this.dialogVisible 
+    },
+    upload2(){     
+      this.roletype = "common"
+      this.dialogVisible = !this.dialogVisible 
+    },
+    // 
+    dialogClose(){
+      this.dialogVisible = false
+      this.clearfile()
+      // 清空字段
+      this.name = ''
+      this.asset_type1 = 1   
+    },
+    // 只显示一个缩略图
+    handleIntroduceUploadHide(file,filelist){ 
+      this.fileList = filelist
+      this.upfiles1 = filelist  
+      this.hideUpload_introduce = filelist.length >= this.limitCount  
+    },
+    handleIntroduceUploadShow(file,fileList){
+      this.fileList = fileList
+      this.upfiles1 = fileList 
+      this.hideUpload_introduce = fileList.length >= this.limitCount
+    },
+    // 文件上传
+    dataUpload(file,fileList){
+      this.showfilelist = true
+      this.upfiles = fileList
+      this.chunkSize = file.size/5
+      if(this.maxFileSize > this.maxFileSize){
+        this.chunkSize = file.size/ Math.ceil(file.size / this.maxFileSize)
+      }       
+    },
+    // 文件移除
+    dataUploadRemove(file,fileList){
+      this.upfiles = fileList
+    },  
+    //  文件上传成功
+    uploadsuccess(){
+      console.log('000000000000000000')
+      // this.findvideocover(file.url,file)
+    },
+
+    findvideocover(url,file){
+
+    },
+    //  文件夹上传
+    handleFileUpload(ev){
+      this.upfiles = document.getElementById("file").files;
+    },
+    // 清除按钮
+    clearfile(){
+      this.$refs.uploadref.clearFiles();
+      this.upfiles = []
+      this.upfile = ''
+    },
+    // 表单提交
+    formSubmit(){
+      // 资产类型标签
+      // this.asset_type = this.assetstype[this.asset_type1-1].label;
+      //  缩略图上传
+      if(this.flagpic < this.upfiles1.length){
+              var picform = new FormData()
+              picform.append('picform',this.upfiles1[0].raw)
+              let url = `http://127.0.0.1:8086/upload?type=pic&md5Val=${this.md5}&roletype=${this.roletype}&username=${this.username}&name=${this.name}&assettype=${this.asset_type}&remark=${this.remark}&filename=${this.upfiles1[0].name}`
+              this.instance.post(url,picform).then(res=>{
+      })
+      }
+      // 文件及其他属性的上传
+      //   上传MP4文件
+      if(this.flag < this.upfiles.length){
+          this.upfile = this.upfiles[this.flag].raw; 
+          var files= this.sliceFile(this.upfile);
+          this.md5File(files).then(md5 =>{
+              this.md5 = md5
+              this.$http.post('upload',{
+                type:'check',
+                md5Val:this.md5,
+                total:files.length,
+                name:this.name,
+                remark:this.remark,
+                assettype:this.asset_type,
+                username:this.username,
+                roletype:this.roletype,
+                uploadtype:'video/mp4',
+              }).then(res=>{
+                if(res.data.msg === 'get_succ'){
+                  this.uploadsuccess()
+                  let chunkIndex = res.data.data.index;
+                  this.uploadfile1(files,chunkIndex,this.md5)
+                }              
+              })
+            })
+      }
+      //  所有文件传递完之后的操作
+      if(this.flag === this.upfiles.length){
+        // 关闭提示框
+              this.dialogVisible = false
+              this.$message({
+                message:'上传成功'
+              })
+              //  清空文件
+              this.clearfile()
+              // 清空字段
+              this.name = ''
+              this.asset_type = ""
+      }
+
+    },    
+    // 切割文件
+    sliceFile(file){
+      for (var i = 0; i < file.size; i += this.chunkSize) {
+        var end = i + this.chunkSize >= file.size ? file.size : i + this.chunkSize;
+        let currentFile =file.slice(i, (end > file.size ? file.size : end));
+        this.files.push(currentFile);
+    }
+    return this.files;
+    },    
+    // 获取文件md5值
+    md5File (files) {
+        const spark = new SparkMD5.ArrayBuffer();
+        let fileReader;
+        for (var i = 0; i < files.length; i++) {
+            fileReader = new FileReader();
+            fileReader.readAsArrayBuffer(files[i]);
+        }
+        return new Promise((resolve) => {
+            fileReader.onload = function(e) {
+                spark.append(e.target.result);
+                if (i == files.length) {
+                    resolve(spark.end());
+                }
+            }
+        })
+    }, 
+    //   上传文件
+    uploadfile1(files,chunkIndex,md5Val){
+          if(this.upfile){
+                  if(chunkIndex<files.length){
+                            let form = new FormData()
+                            let file = new File([files[chunkIndex]], chunkIndex, {type: this.upfile.type, lastModified: Date.now()});
+                            form.append('file',file)
+                            let url = `http://127.0.0.1:8086/upload?type=upload&current=${chunkIndex}&md5Val=${md5Val}&total=${files.length}&roletype=${this.roletype}&username=${this.username}&name=${this.name}&assettype=${this.asset_type}&remark=${this.remark}&uploadtype=video/mp4`
+                            this.instance.post(url,form).then(res=>{
+                               let chunkIndex = res.data.data.index
+                               if(chunkIndex < files.length){
+                                   this.uploadfile1(files,chunkIndex,this.md5)
+                               }
+                               else{
+                                   this.merger(files,this.md5)
+                               }
+                            })
+                  }
+                }
+    },
+    //  合并
+    merger(files,md5Val){
+       this.$http.post('upload',{
+          type:'merger',
+          filename:this.upfile.name,
+          md5Val:md5Val,
+          total:files.length,
+          name:this.name,
+          assettype:this.asset_type,
+          remark:this.remark,
+          username:this.username,
+          roletype:this.roletype,
+          uploadtype:'video/mp4',
+      }).then(res=>{
+        this.flag += 1
+        this.flagpic += 1
+        this.formSubmit()        
+      })
+    },
+  },
+}
+
+// window.addEventListener("dragend",()=>{
+//   console.log('1');
+// })
+// export default {
+//   name:'props91',
+//   data () {
+//     return{
+//       list:[1,2],
+//       indexVal:0,
+//       assetstype:[{
+//         value:0,
+//         label:'选选项一'
+//       },{
+//         value:1,
+//         label:'选选项2'
+//       },{
+//         value:2,
+//         label:'选选项3'
+//       },{
+//         value:3,
+//         label:'选选项4'
+//       },{
+//         value:4,
+//         label:'选选项一'
+//       }],
+//       value:'',
+//       filelist:[],
+//       upfile:'',
+//       flag:'',
+//       chunkSize:0,
+//       files:[],
+//     }
+//   },
+//   created(){
+//     this.sendUrl()
+//   },
+//   methods:{
+//     sendUrl(){
+//         window.addEventListener("dragend",()=>{
+//         console.log('1');
+//       })
+//     },
+//     getIndex(){
+//       this.indexVal = index
+//     },
+//     // 上传
+//     upload(){
+
+//     },
+//     uploadchange(file,fileList){
+//       // console.log(fileList)
+//       this.upfile = fileList[0].raw;
+//       console.log(this.upfile)
+
+//       // this.sliceFile(this.upfile)
+//       // var files = this.sliceFile(this.upfile)
+//       // console.log(this.upfile,'----')
+//       // if(this.flag < this.upfiles.length){
+//       //     this.upfile = this.upfiles[this.flag].raw; 
+//       //     var files= this.sliceFile(this.upfile);
+//       //     this.md5File(files).then(md5 =>{
+//       //         this.md5 = md5
+//       //         this.$http.post('upload',{
+//       //           type:'check',
+//       //           md5Val:this.md5,
+//       //           total:files.length,
+//       //           name:this.name,
+//       //           remark:this.remark,
+//       //           assettype:this.asset_type,
+//       //           username:this.username,
+//       //           roletype:this.roletype,
+//       //         }).then(res=>{
+//       //           if(res.data.msg === 'get_succ'){
+//       //             let chunkIndex = res.data.data.index;
+//       //             this.uploadfile1(files,chunkIndex,this.md5)
+//       //           }              
+//       //         })
+//       //     })
+//       // }
+//     },
+//     // sliceFile(file){
+//     //   for (var i = 0; i < file.size; i += this.chunkSize) {
+//     //     var end = i + this.chunkSize >= file.size ? file.size : i + this.chunkSize;
+//     //     let currentFile =file.slice(i, (end > file.size ? file.size : end));
+//     //     this.files.push(currentFile);
+//     //   }
+//     //   console.log(this.files)
+//     //   return this.files;
+//     // },
+//     uploadremove(file,fileList){
+
+//     },
+//   }
+// }
+
+</script>
+
+<style>
+.el-icon-plus{
+  position: relative;
+  margin-top: 10px;
+}
+</style>
+
+

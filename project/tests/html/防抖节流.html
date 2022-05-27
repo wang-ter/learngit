@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+     <div id="content" style="height: 500px;background: pink;text-align: center;line-height: 500px;font-size: 40px;"></div>
+    
+</body>
+<script>
+    let content = document.getElementById('content');
+    let num = 1
+    function count(){
+        content.innerHTML = num ++
+        console.log(num,'ssss')
+    }
+
+    // 非立即执行版
+    // function test1(fun,wait){
+    //     let timeout
+    //     return function(){
+    //         let context = this
+    //         let args = arguments
+    //         if(timeout){
+    //             clearTimeout(timeout)
+    //         }
+    //         timeout = setTimeout(()=>{
+    //             fun.apply(context,args)
+    //         },wait)
+    //     }
+    // }
+
+    // content.onmousemove = test1(count,1000)
+
+    // 立即执行版
+    // function test2(fun,wait){
+    //     let timeout
+    //     return function(){
+    //         let context = this
+    //         let args = arguments
+    //         if(timeout) clearTimeout(timeout)
+    //         let callNow = !timeout
+    //         timeout = setTimeout(()=>{
+    //             timeout = null
+    //         },wait)
+    //         if(callNow){
+    //             fun(context,args)
+    //         }
+    //     }
+    // }
+    // content.onmousemove = test2(count,1000)
+
+
+//   function jieliu(fun,wait){
+//       let timeout
+//     return function(){
+//         let context = thiss
+//         let args = arguments
+//         if(!timeout){
+//             timeout = setTimeout(()=>{
+//                 timeout = null
+//                 fun(context,args)
+//             },wait)
+//         }
+//     }
+//   }
+
+//   function jieliu(fun,wait){
+//       let previous = 0;
+//       return function(){
+//           let context = this
+//           let args = arguments
+//           let now = Date.now();
+//           if(now - previous > wait){
+//               fun.apply(context,args)
+//               previous= now
+//           }
+//       }
+//   }
+//   content.onmousemove = jieliu(count,1000)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // function debounce(func,wait){
+    //     let timeout;
+    //     return function(){
+    //         if(timeout) clearTimeout(timeout)
+    //         timeout = setTimeout(()=>{
+    //             func()
+    //         },1000)
+    //     }
+    // }
+    // content.onmousemove = debounce(count,1000)
+
+    // function count(){
+    //     content.innerHTML = num ++
+    // }
+//     非立即版执行
+    // function debounce(fun,wait){
+    //     let timeout
+    //     return function(){
+    //         let context = this
+    //         let args = arguments
+    //         if(timeout) clearTimeout(timeout)
+    //         timeout = setTimeout(()=>{
+    //             fun.apply(context,args)
+    //         },wait)
+    //     }
+    // }
+    
+    // content.onmousemove = debounce(count,1000)
+
+
+    // 立即版执行
+    // function debounce1(fun,wait){
+    //     let timeout;
+    //     return function(){
+    //         let context = this
+    //         let args = arguments
+    //         if(timeout) clearTimeout(timeout)
+    //         let callNow = !timeout
+    //         timeout = setTimeout(()=>{
+    //             fun.apply(context,args)
+    //         },wait)
+    //         if(callNow) fun.apply(context,args)
+    //     }
+    // }
+    // content.onmousemove = debounce1(count,1000)
+
+//  时间戳
+    // function throttle(func,wait){
+    //     let previous = 0
+    //     return function(){
+    //         let now = Date.now()
+    //         let context = this
+    //         let args = arguments
+    //         if(now-previous > wait){
+    //             func.apply(context,args)
+    //             previous = now
+    //         }
+    //     }
+    // }
+
+
+    // content.onmousemove = throttle(count,1000)
+
+    //     定时器版本
+    // function throttle(func,wait){
+    //     let timeout
+    //     return function(){
+    //         let context = this
+    //         let args = arguments
+    //         if(!timeout){
+    //             timeout = setTimeout(()=>{
+    //                 timeout = null
+    //                 func.apply(context,args)
+    //             },wait)
+    //         }
+    //     }
+    // }
+    // content.onmousemove = throttle(count,1000)
+
+</script>
+</html>

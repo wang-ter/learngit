@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        function CupCustom(diameter, height) {
+            this.diameter = diameter;
+            this.height = height;
+        };
+        CupCustom.prototype.color = 'blue';
+        var cup1 = new CupCustom(8, 15);
+        var cup2 = new CupCustom(5, 10);
+        console.log(cup1.__proto__.height)
+        console.log(cup1.height)
+        console.log(cup1.constructor.prototype)
+        console.log(cup2)
+        console.log(cup1.height);//15
+        console.log(cup2.color);
+    </script>
+    
+</body>
+</html>
