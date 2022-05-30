@@ -75,6 +75,11 @@
             <a href="http://www.svn.org.cn/229.html">svn的搭建和使用</a>
         </p>
     </div>
+    <div>
+        <h1>六、进制间的转换</h1>
+        <p>parseInt将二进制、八进制、十六进制等转换成十进制</p>
+        <p>(其他进制类型的数字).toString(2/8/16)可以将十进制转换成其他进制类型</p>
+    </div>
   </div>
 </template>
 
